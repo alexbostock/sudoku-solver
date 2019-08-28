@@ -1,16 +1,5 @@
 mod sudoku {
     #[derive(Clone)]
-    enum PuzzleSize {
-        Four,
-        Six,
-        Nine,
-        Twelve,
-        Sixteen,
-        Twenty,
-        TwentyFive,
-    }
-
-    #[derive(Clone)]
     enum Cell {
         Value(i8),
         PossibleValues(std::collections::HashSet<i8>),
@@ -18,13 +7,14 @@ mod sudoku {
 
     #[derive(Clone)]
     pub struct Puzzle {
-        size: PuzzleSize,
+        // A puzzle is n x n (so standard sudoku puzzles have n = 9)
+        n: i8,
         grid: Vec<Vec<Cell>>,
     }
 
     pub fn brute_force(p: Puzzle) -> Option<Puzzle> {
         let r = Puzzle {
-            size: p.size.clone(),
+            n: p.n,
             grid: Vec::new(),
         };
 
