@@ -1,14 +1,14 @@
 mod sudoku {
     #[derive(Clone)]
     enum Cell {
-        Value(i8),
-        PossibleValues(std::collections::HashSet<i8>),
+        Value(u8),
+        PossibleValues(std::collections::HashSet<u8>),
     }
 
     #[derive(Clone)]
     pub struct Puzzle {
         // A puzzle is n x n (so standard sudoku puzzles have n = 9)
-        n: i8,
+        n: u8,
         grid: Vec<Vec<Cell>>,
     }
 
@@ -47,6 +47,48 @@ mod sudoku {
         }
 
         return Some(s);
+    }
+
+    fn is_valid(p: &Puzzle) -> bool {
+        // Check each row
+        p.grid.iter().fold(true, |acc, row| {
+            acc && !row
+                .iter()
+                .fold(
+                    (1..=p.n.pow(2)).clone().collect(),
+                    |mut digits: std::collections::HashSet<u8>, x: &Cell| match x {
+                        Cell::Value(v) => {
+                            digits.remove(&v);
+                            digits
+                        }
+                        Cell::PossibleValues(vs) => digits.difference(&vs).cloned().collect(),
+                    },
+                )
+                .is_empty()
+        }) &&
+
+        // Column
+        (1..=p.n.pow(2)).fold(true, |acc, col| {
+            acc && !p
+                .grid
+                .iter()
+                .fold((1..=p.n.pow(2)).clone().collect(), |mut digits: std::collections::HashSet<u8>, x| match &x[usize::from(col)] {
+                    Cell::Value(v) => {
+                        digits.remove(&v);
+                        digits
+                    }
+                    Cell::PossibleValues(vs) => digits.difference(&vs).cloned().collect(),
+                })
+                .is_empty()
+        }) &&
+
+        // Box
+        (0..p.n).fold(true, |acc, box_row| {
+             acc && (0..p.n).fold(true, |acc, box_col| {
+                 // TODO: iterate over p.n cells from p.n rows, testing same condition as above
+                 acc && true
+             })
+        })
     }
 }
 
