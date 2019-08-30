@@ -22,6 +22,10 @@ mod sudoku {
     }
 
     fn try_combinations(p: &Puzzle, r: &Puzzle) -> Option<Puzzle> {
+        if !is_valid(r) {
+            return None;
+        }
+
         let mut s = r.clone();
 
         for (i, row) in p.grid.iter().enumerate() {
