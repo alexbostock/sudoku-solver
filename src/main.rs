@@ -54,8 +54,10 @@ mod sudoku {
     }
 
     fn is_valid(p: &Puzzle) -> bool {
+        // TODO: learn custom iterators etc. to make this function more readable
+
         // Check each row
-        p.grid.iter().fold(true, |acc, row| {
+        let ok = p.grid.iter().fold(true, |acc, row| {
             acc && !row
                 .iter()
                 .fold(
@@ -84,15 +86,39 @@ mod sudoku {
                     Cell::PossibleValues(vs) => digits.difference(&vs).cloned().collect(),
                 })
                 .is_empty()
-        }) &&
+        });
+
+        if !ok {
+            return false;
+        }
 
         // Box
-        (0..p.n).fold(true, |acc, box_row| {
-             acc && (0..p.n).fold(true, |acc, box_col| {
-                 // TODO: iterate over p.n cells from p.n rows, testing same condition as above
-                 acc && true
-             })
-        })
+        let n = p.n as usize;
+
+        for box_row in 0..n {
+            for box_col in 0..n {
+                let mut digits: std::collections::HashSet<u8> = (1..=p.n.pow(2)).clone().collect();
+
+                for i in 0..n {
+                    for j in 0..n {
+                        match &p.grid[box_row * n + i][box_col * n + j] {
+                            Cell::Value(v) => {
+                                digits.remove(&v);
+                            }
+                            Cell::PossibleValues(vs) => {
+                                digits = digits.difference(&vs).cloned().collect();
+                            }
+                        };
+                    }
+                }
+
+                if !digits.is_empty() {
+                    return false;
+                }
+            }
+        }
+
+        return true;
     }
 }
 
